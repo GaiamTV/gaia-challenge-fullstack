@@ -10,6 +10,8 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
   1. Implement a form in React (input and button) which takes `seriesId` as an input and fetches data for that series
 * The final data will represent a series and up to 20 of its episodes
 * All challenge requirements can be found in the [Acceptance Criteria Section](#acceptance-criteria)
+  * Please complete as many of the requirements as you can within the suggested timebox (2-3 hrs)
+  * Emphasize functionality **more** than polish/code quality
 
 ### Contents
 <!--ts-->
@@ -42,12 +44,12 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 * Find the `TODO` comments in these files
 
 ### Guidelines
-1. Install and use any packages you wish.
+1. Install and use **any** packages/libraries you wish.
 1. Add any folders and files you may need to organize your code.
 1. Try to timebox no more than 2-3 hours for this exercise. 
 
 ### Acceptance Criteria
-1. Implement a simple form using React/Redux that accepts a numeric id value. This id corresponds to one of our original video series (`seriesId`).
+1. Implement a simple form using React that accepts a numeric id value. This id corresponds to one of our original video series (`seriesId`).
    * Sample test values:
      1. `122881`
      1. `179166`
@@ -138,7 +140,7 @@ _UX and layout requirements are detailed below._
     * Requesting data and handling response
     * Understanding of React lifecycle
     * Well-defined component Structure
-    * Concise styling
+    * Concise CSS
   * Express Server:
     * Concurrent http requests
     * Manipulating data
