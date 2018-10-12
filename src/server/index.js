@@ -35,7 +35,7 @@ app.listen(port, () => console.log(`Congrats, the server is running.  Serving fr
 /**
  * Example node response from https://brooklyn.gaia.com/node/[:nodeId]
  */
-export const exampleNodeData = {
+const exampleNodeData = {
   "fields": {
     "body": [
       {
@@ -179,7 +179,7 @@ export const exampleNodeData = {
  * Example response from https://brooklyn.gaia.com/v2/videos/series/[:seriesId]
  * - Will be an array of [episode] objects (example below)
  */
-export const exampleSeriesEpisodesData = { // episode data
+const exampleSeriesEpisodesData = { // episode data
   "seriesId": 179166,
   "seriesPath": "series/thrive-self-healing-ayurveda",
   "seriesTitle": "Thrive: Self-Healing with Ayurveda",
