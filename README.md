@@ -21,7 +21,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 * [Guidelines](#guidelines)
 * [Acceptance Criteria](#acceptance-criteria)
 * [Mocks](#mocks)
-* [What we are testing for](#what-we-are-testing-for)
+* [What is being tested for](#what-is-being-tested-for)
 <!--te-->
 
 ### Pre-requisites
@@ -33,7 +33,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ### Running the project
 1. From a terminal, run `$ npm install` to install dependencies.
 1. Run `$ npm start` to start the React application.
-1. In the other terminal, run `$ npm run server` to run the Express server.
+1. In the other terminal, run `$ npm run server` to run an Express server on port: 9001
 1. View the running web app in your browser by navigating to `http://localhost:3000`.
 
 ### Orienting yourself
@@ -49,20 +49,21 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 1. Try to timebox no more than 2-3 hours for this exercise. 
 
 ### Acceptance Criteria
-1. Implement a simple form using React that accepts a numeric id value. This id corresponds to one of our original video series (`seriesId`).
+1. Implement a simple form using React that accepts a numeric id value. This id corresponds to one of Gaia's original video series (`seriesId`).
    * Sample test values:
      1. `122881`
      1. `179166`
      1. `166896`
-1. Use the `seriesId` to make a RESTful call to an API that responds with the metadata for the related series. You will implement the handler for this API endpoint. The handler should:
-   * Use the `seriesId` included on the HTTP request to proxy another external HTTP request.
-   * Process and transform the response data (details below) and serve it back in the response to the original request.
-   * Handle any errors.
-1. When receiving a successful, and well-formed response from the API service, the web app should render the following:
+   * On form submit - pass `seriesId` with an http request to the local Express server.
+1. Implement a route handler in the local Express server that:
+   * Uses the `seriesId` included on the incoming http request to proxy another external http request to Gaia content API's.
+   * Process and transform response data and serve it back to the original request (response schema below).
+   * Handle and pass along any errors
+1. When receiving a successful, and well-formed response from the Express server, the web app should render the following:
    * The hero artwork for the series.
    * The title for the series.
    * An ordered list of episode titles in ascending order.
-   
+
 _UX and layout requirements are detailed below._
 
 #### Starting Points:
@@ -77,11 +78,13 @@ _UX and layout requirements are detailed below._
         * Datapoints to use:
           * Series hero art -- `exampleNodeData.hero_image.hero_1070x400`
           * Series title -- `exampleNodeData.title`
-     1. Then fetches Episode data > http GET request to `https://brooklyn.gaia.com/v2/videos/series/[:seriesId]`
+     1. Fetches Episode data > http GET request to `https://brooklyn.gaia.com/v2/videos/series/[:seriesId]`
         * Data from this endpoint will be an array of `exampleSeriesEpisodeData`
         * The route is paginated (please do **NOT** implement pagination)
           * The endpoint will return up to 20 episodes by default (use these)
-        * All we want from this data is the episodes' title and the episodes' number
+        * Datapoints to use:
+          * Episode Title -- `episode.title`
+          * Episode number -- `episode.episode`
         * Iterate over the raw array of `exampleSeriesEpisodeData` and create an array of `basicEpisode`:
           ```js
           const basicEpisode = {
@@ -94,7 +97,7 @@ _UX and layout requirements are detailed below._
          {
            seriesHeroArt: string,
            seriesTitle: string,
-           episodeList: [ ..., {basicEpisode}, ... ],
+           episodeList: [ ..., { basicEpisode }, ... ],
          }
          ```
       1. Implement Catch logic to return meaningful errors to your client
@@ -126,6 +129,7 @@ _UX and layout requirements are detailed below._
        * Error - If the request returns an error
          * Use a clear visual indicator that the last request failed
          * A generic 'Request Failed' message is sufficient
+           * Simple way to trigger errors - send an invalid `seriesId` (ex: `12938635498612349`)
 
 ### Mocks
 #### Default View
@@ -133,7 +137,7 @@ _UX and layout requirements are detailed below._
 #### Form States
 <img src="form-states.png" width="42%" />
 
-### What we are testing for:
+### What is being tested for
   * Does the solution satisfy the acceptance criteria?
   * React:
     * Effective and consistent state management
