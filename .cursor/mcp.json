@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gaia-graphql": {
+      "url": "https://graphql-mcp.gaia.com/mcp"
+    },
+    "gaia-graphql-stage": {
+      "url": "https://graphql-mcp-stage.gaia.com/mcp"
+    }
+  }
+}

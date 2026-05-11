@@ -1,0 +1,61 @@
+---
+alwaysApply: true
+---
+# Project patterns and guidelines
+
+This repo is an npm workspaces monorepo: `apps/api` (Express + TypeScript) and `apps/web` (React + MUI + webpack). Prefer workspace scripts from the root `package.json` (`npm run dev:api`, `npm run dev:web`, `npm run type-check`) over ad hoc paths when a script already exists.
+
+## Architecture
+
+- **API** (`apps/api`): Entry is `src/index.ts`; app factory and routes live under `src/` (for example `app.ts`). Keep HTTP wiring thin; put reusable logic in small modules (for example `src/services/<feature>/` or `src/lib/`) as the codebase grows, and co-locate tests with the code they cover.
+- **Web** (`apps/web`): Entry is `src/index.tsx`; root UI in `src/App.tsx`. Reusable UI under `src/components/`. Prefer composition and small components over large single files.
+- **New files**: Prefer TypeScript (`.ts` / `.tsx`) for new source. Match the surrounding package (`commonjs` vs ESM) and existing import style.
+- **Naming**: Prefer domain language that matches product concepts and API payloads. Use vendor-specific names inside adapters or clients, not at the UI boundary, unless the product name is the vendor term.
+- **Libraries over custom code**: Prefer dependencies and patterns already in the repo (Express, React, MUI) over one-off utilities duplicated across apps.
+
+## API (Express)
+
+- **Structure**: Use `createApp()` (or equivalent) to build the app for tests and production. Register middleware and routes in a predictable order (parsing, logging if any, routes, error handling when added).
+- **Handlers**: Prefer named functions or small inline handlers; avoid deep nesting—use guard clauses and early returns.
+- **Secrets and logging**: Do not log raw authorization headers, cookies, API keys, or tokens. Redact or omit sensitive fields from structured logs.
+- **Errors**: Map unexpected failures to appropriate HTTP status codes in a single place (middleware) when you add centralized error handling; until then, avoid swallowing errors—let them surface or convert them to typed HTTP responses deliberately.
+
+## Web (React)
+
+- **Components**: Prefer function components. Keep side effects in `useEffect` (or event handlers), not during render.
+- **State**: Lift state only as far as needed. Prefer local state and clear props over global state until a need is proven.
+- **MUI / Emotion**: Use the theme and `sx` (or styled components) consistently with existing screens. Avoid inline `style={}` when `sx` already matches the file’s pattern.
+- **Data fetching**: When you add API calls, centralize base URL and fetch helpers; handle loading, error, and empty states explicitly (patterns like the existing query-state wrapper are preferred over ad hoc booleans scattered through the tree).
+
+## Coding style
+
+- **Functional style**: Prefer `map`, `filter`, `reduce`, and related methods for clarity. Use `for` / `while` only when profiling or readability clearly favors it.
+- **Conditionals**: Prefer `some` / `every` or small data structures over long `||` / `&&` chains when the cases are uniform. For discriminated variants, prefer `switch` or a map of handlers over deep `if` / `else if` ladders when it reads better.
+- **Documentation**: Use short comments or JSDoc for behavior and edge cases. Put **types in TypeScript**, not in `@type` JSDoc tags.
+- **Imports**: Keep imports at the top of the file. Use `import type` for type-only imports. Import specific names rather than entire namespaces when practical.
+
+## Error handling
+
+- **Propagation**: Do not blanket-catch to log and ignore. Let errors propagate unless you are converting them to a meaningful domain or HTTP error, or performing a specific recovery.
+- **Guard clauses**: Prefer early validation, early `throw` or early `return`, and a straight-line success path over deep nesting.
+
+## TypeScript
+
+- **Tooling**: From repo root, `npm run type-check` runs `type-check` in each workspace that defines it. Per package: `npm run type-check --workspace=api` or `--workspace=web`.
+- **Avoid `any`**: Use `unknown` and narrow, or proper generics.
+- **Literal unions**: For small closed sets (status, kind, mode), prefer string literal unions or shared type aliases.
+- **`type` vs `interface`**: Prefer `type` for unions and compositions; `interface` for object shapes you expect to extend—unless the file already standardizes on one style.
+- **Inference**: Prefer implied return types and contextual parameter types when the surrounding signature already fixes the shape. Add explicit annotations when they document a public contract, fix inference, or pin `Promise<...>` / `void` intentionally.
+- **Function arguments**: For several related arguments, prefer a single options object with a typed shape when it improves call sites—exceptions remain for framework signatures (for example Express `(req, res, next)`).
+- **Callbacks**: Avoid redundant type parameters on inner parameters when the outer generic already fixes them (same principle as Brooklyn’s inference guidelines).
+
+## Testing (when present)
+
+- **Placement**: Co-locate tests with the module under test (same folder) unless the repo later standardizes otherwise.
+- **Naming**: Prefer `*.spec.ts` or `*.spec.tsx` aligned with team tooling; match existing files if the suite already uses a different pattern.
+- **Task execution**: Prefer `npm` scripts from `package.json` over duplicated raw `node` invocations.
+
+## Git and commits
+
+- **Format**: [Conventional Commits](https://www.conventionalcommits.org/); single subject line, body optional.
+- **Shape**: Use types such as `feat`, `fix`, `chore`, `docs`, `refactor` as appropriate for this project. Include a ticket key in parentheses when your workflow requires it (for example `feat(AP-1234): add health check`).
