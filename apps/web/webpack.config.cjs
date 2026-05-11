@@ -1,11 +1,15 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 /** @param {unknown} _env */
 /** @param {{ mode?: string }} argv */
 module.exports = (_env, argv) => {
-  const isProd = argv.mode === 'production'
+  const mode = argv.mode || 'development'
+  const isProd = mode === 'production'
+  const graphqlProxyTarget = process.env.GRAPHQL_PROXY_TARGET
+
   return {
     entry: './src/index.tsx',
     output: {
@@ -27,6 +31,17 @@ module.exports = (_env, argv) => {
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(
+          isProd ? 'production' : 'development',
+        ),
+        'process.env.GRAPHQL_HTTP_URI': JSON.stringify(
+          process.env.GRAPHQL_HTTP_URI ?? '/graphql',
+        ),
+        'process.env.GRAPHQL_AUTH': JSON.stringify(
+          process.env.GRAPHQL_AUTH ?? '',
+        ),
+      }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
       }),
@@ -41,6 +56,18 @@ module.exports = (_env, argv) => {
       port: 8080,
       hot: true,
       historyApiFallback: true,
+      ...(graphqlProxyTarget
+        ? {
+            proxy: [
+              {
+                context: ['/graphql'],
+                target: graphqlProxyTarget,
+                changeOrigin: true,
+                secure: false,
+              },
+            ],
+          }
+        : {}),
     },
     devtool: isProd ? 'source-map' : 'eval-cheap-module-source-map',
   }
