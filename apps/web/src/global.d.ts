@@ -5,7 +5,7 @@
 declare const process: {
   env: {
     NODE_ENV: string
-    GAIA_STAGE_GRAPHQL_URI: string
+    GAIA_GRAPHQL_URI: string
     CODING_CHALLENGE_GRAPHQL_URI: string
     GRAPHQL_AUTH: string
   }

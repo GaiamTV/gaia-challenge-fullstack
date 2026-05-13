@@ -8,8 +8,8 @@ import {
 
 const shouldConnectToDevTools = process.env.NODE_ENV === 'development'
 
-function gaiaStageGraphqlUri(): string {
-  const uri = process.env.GAIA_STAGE_GRAPHQL_URI
+function gaiaGraphqlUri(): string {
+  const uri = process.env.GAIA_GRAPHQL_URI
   if (typeof uri === 'string' && uri.length > 0) {
     return uri
   }
@@ -47,7 +47,7 @@ const authLink = setContext((_, { headers }) => {
 
 export function createGaiaStageApolloClient() {
   const httpLink = new HttpLink({
-    uri: gaiaStageGraphqlUri(),
+    uri: gaiaGraphqlUri(),
   })
 
   const cache = new InMemoryCache({

@@ -7,15 +7,19 @@ process.env.NODE_CONFIG_DIR = path.join(__dirname, 'config')
 
 /**
  * @param {boolean} isProd
- * @returns {string}
+ * @returns {{ gaiaGraphqlUri: string, codingChallengeGraphqlUri: string }}
  */
-function gaiaStageGraphqlUriFromConfig(isProd) {
+function graphqlUrisFromConfig(isProd) {
   if (isProd && !process.env.NODE_CONFIG_ENV) {
     process.env.NODE_CONFIG_ENV = 'production'
   }
   const nodeConfig = require('config')
-  const base = nodeConfig.get('servers.graphql')
-  return `${String(base).replace(/\/$/, '')}/graphql`
+  const gaiaBase = nodeConfig.get('servers.gaia.graphql')
+  const codingChallengeBase = nodeConfig.get('servers.codingChallenge.graphql')
+  return {
+    gaiaGraphqlUri: String(gaiaBase).replace(/\/$/, ''),
+    codingChallengeGraphqlUri: String(codingChallengeBase).replace(/\/$/, ''),
+  }
 }
 
 /** @param {unknown} _env */
@@ -25,17 +29,19 @@ module.exports = (_env, argv) => {
   const isProd = mode === 'production'
   const graphqlProxyTarget = process.env.GRAPHQL_PROXY_TARGET
 
-  const envGaiaStageUri = process.env.GAIA_STAGE_GRAPHQL_URI
-  const gaiaStageGraphqlUri =
-    typeof envGaiaStageUri === 'string' && envGaiaStageUri.length > 0
-      ? envGaiaStageUri
-      : gaiaStageGraphqlUriFromConfig(isProd)
+  const configUris = graphqlUrisFromConfig(isProd)
+  
+  const envGaiaUri = process.env.GAIA_GRAPHQL_URI
+  const gaiaGraphqlUri =
+    typeof envGaiaUri === 'string' && envGaiaUri.length > 0
+      ? envGaiaUri
+      : configUris.gaiaGraphqlUri
 
   const envCodingChallengeUri = process.env.CODING_CHALLENGE_GRAPHQL_URI
   const codingChallengeGraphqlUri =
     typeof envCodingChallengeUri === 'string' && envCodingChallengeUri.length > 0
       ? envCodingChallengeUri
-      : 'http://localhost:9001/graphql'
+      : configUris.codingChallengeGraphqlUri
 
   return {
     entry: './src/index.tsx',
@@ -62,7 +68,7 @@ module.exports = (_env, argv) => {
         'process.env.NODE_ENV': JSON.stringify(
           isProd ? 'production' : 'development',
         ),
-        'process.env.GAIA_STAGE_GRAPHQL_URI': JSON.stringify(gaiaStageGraphqlUri),
+        'process.env.GAIA_GRAPHQL_URI': JSON.stringify(gaiaGraphqlUri),
         'process.env.CODING_CHALLENGE_GRAPHQL_URI': JSON.stringify(codingChallengeGraphqlUri),
         'process.env.GRAPHQL_AUTH': JSON.stringify(
           process.env.GRAPHQL_AUTH ?? '',
