@@ -9,7 +9,7 @@ process.env.NODE_CONFIG_DIR = path.join(__dirname, 'config')
  * @param {boolean} isProd
  * @returns {string}
  */
-function graphqlHttpUriFromConfig(isProd) {
+function gaiaStageGraphqlUriFromConfig(isProd) {
   if (isProd && !process.env.NODE_CONFIG_ENV) {
     process.env.NODE_CONFIG_ENV = 'production'
   }
@@ -25,11 +25,17 @@ module.exports = (_env, argv) => {
   const isProd = mode === 'production'
   const graphqlProxyTarget = process.env.GRAPHQL_PROXY_TARGET
 
-  const envGraphqlUri = process.env.GRAPHQL_HTTP_URI
-  const graphqlHttpUri =
-    typeof envGraphqlUri === 'string' && envGraphqlUri.length > 0
-      ? envGraphqlUri
-      : graphqlHttpUriFromConfig(isProd)
+  const envGaiaStageUri = process.env.GAIA_STAGE_GRAPHQL_URI
+  const gaiaStageGraphqlUri =
+    typeof envGaiaStageUri === 'string' && envGaiaStageUri.length > 0
+      ? envGaiaStageUri
+      : gaiaStageGraphqlUriFromConfig(isProd)
+
+  const envCodingChallengeUri = process.env.CODING_CHALLENGE_GRAPHQL_URI
+  const codingChallengeGraphqlUri =
+    typeof envCodingChallengeUri === 'string' && envCodingChallengeUri.length > 0
+      ? envCodingChallengeUri
+      : 'http://localhost:9001/graphql'
 
   return {
     entry: './src/index.tsx',
@@ -56,7 +62,8 @@ module.exports = (_env, argv) => {
         'process.env.NODE_ENV': JSON.stringify(
           isProd ? 'production' : 'development',
         ),
-        'process.env.GRAPHQL_HTTP_URI': JSON.stringify(graphqlHttpUri),
+        'process.env.GAIA_STAGE_GRAPHQL_URI': JSON.stringify(gaiaStageGraphqlUri),
+        'process.env.CODING_CHALLENGE_GRAPHQL_URI': JSON.stringify(codingChallengeGraphqlUri),
         'process.env.GRAPHQL_AUTH': JSON.stringify(
           process.env.GRAPHQL_AUTH ?? '',
         ),

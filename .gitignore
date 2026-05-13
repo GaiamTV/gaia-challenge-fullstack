@@ -4,5 +4,4 @@ dist
 *.log
 .cache
 coverage
-.env
 .env.local
