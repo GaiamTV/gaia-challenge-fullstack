@@ -8,20 +8,20 @@ import {
 
 const shouldConnectToDevTools = process.env.NODE_ENV === 'development'
 
-const cache = new InMemoryCache({
-  typePolicies: {
-    ContentProvider: {
-      keyFields: ['contentId'],
-    },
-  },
-})
-
-function graphqlHttpUri(): string {
-  const uri = process.env.GRAPHQL_HTTP_URI
+function gaiaGraphqlUri(): string {
+  const uri = process.env.GAIA_GRAPHQL_URI
   if (typeof uri === 'string' && uri.length > 0) {
     return uri
   }
   return '/graphql'
+}
+
+function codingChallengeGraphqlUri(): string {
+  const uri = process.env.CODING_CHALLENGE_GRAPHQL_URI
+  if (typeof uri === 'string' && uri.length > 0) {
+    return uri
+  }
+  return 'http://localhost:9001/graphql'
 }
 
 function authorizationHeader(): string | undefined {
@@ -45,13 +45,37 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
-export function createApolloClient() {
+export function createGaiaStageApolloClient() {
   const httpLink = new HttpLink({
-    uri: graphqlHttpUri(),
+    uri: gaiaGraphqlUri(),
+  })
+
+  const cache = new InMemoryCache({
+    typePolicies: {
+      ContentProvider: {
+        keyFields: ['contentId'],
+      },
+    },
   })
 
   return new ApolloClient({
     link: from([authLink, httpLink]),
+    cache,
+    devtools: {
+      enabled: shouldConnectToDevTools,
+    },
+  })
+}
+
+export function createCodingChallengeApolloClient() {
+  const httpLink = new HttpLink({
+    uri: codingChallengeGraphqlUri(),
+  })
+
+  const cache = new InMemoryCache()
+
+  return new ApolloClient({
+    link: httpLink,
     cache,
     devtools: {
       enabled: shouldConnectToDevTools,

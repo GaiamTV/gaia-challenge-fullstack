@@ -6,12 +6,16 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "type-check": "tsc --noEmit",
-    "build": "tsc",
+    "build": "tsc && mkdir -p dist/graphql && cp src/graphql/schema.gql dist/graphql/schema.gql",
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@as-integrations/express4": "^1.1.2",
     "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "graphql": "^16.14.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

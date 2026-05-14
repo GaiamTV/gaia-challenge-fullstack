@@ -25,16 +25,23 @@ const sectionCardSx = {
 export interface ContentSectionAccordionProps {
   /** Called when the user clicks "Fetch Content" */
   onFetchContent?: () => void
+  /** Called when the user clicks "codingChallengeList" */
+  onFetchCodingChallenge?: () => void
   /** Optional extra content below the button inside expanded panel */
   children?: ReactNode
 }
 
 export default function ContentSectionAccordion({
   onFetchContent,
+  onFetchCodingChallenge,
   children,
 }: ContentSectionAccordionProps) {
   const handleFetch = () => {
     onFetchContent?.()
+  }
+
+  const handleFetchCodingChallenge = () => {
+    onFetchCodingChallenge?.()
   }
 
   return (
@@ -76,9 +83,14 @@ export default function ContentSectionAccordion({
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ px: 0, pt: 2, pb: 0 }}>
-          <Button variant="contained" color="primary" onClick={handleFetch}>
-            Fetch Content
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button variant="contained" color="primary" onClick={handleFetch}>
+              Fetch Content
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleFetchCodingChallenge}>
+              codingChallengeList
+            </Button>
+          </Box>
           {children}
         </AccordionDetails>
       </Accordion>

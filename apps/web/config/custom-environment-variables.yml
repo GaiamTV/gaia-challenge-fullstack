@@ -1,2 +1,5 @@
 servers:
-  graphql: SERVERS_GRAPHQL
+  gaia:
+    graphql: SERVERS_GAIA_GRAPHQL
+  codingChallenge:
+    graphql: SERVERS_CODING_CHALLENGE_GRAPHQL
