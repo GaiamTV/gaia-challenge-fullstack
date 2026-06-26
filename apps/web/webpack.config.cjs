@@ -1,9 +1,28 @@
 const path = require('path')
+const { config: loadDotenv } = require('dotenv')
 const webpack = require('webpack')
+
+const webDir = __dirname
+const repoRoot = path.join(webDir, '../..')
+
+loadDotenv({ path: path.join(repoRoot, '.env') })
+loadDotenv({ path: path.join(webDir, '.env') })
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 process.env.NODE_CONFIG_DIR = path.join(__dirname, 'config')
+
+/** @param {string} uri */
+function ensureGraphqlPath(uri) {
+  const trimmed = String(uri).trim().replace(/\/+$/, '')
+  if (!trimmed || trimmed === '/') {
+    return '/graphql'
+  }
+  if (trimmed.endsWith('/graphql')) {
+    return trimmed
+  }
+  return `${trimmed}/graphql`
+}
 
 /**
  * @param {boolean} isProd
@@ -17,8 +36,8 @@ function graphqlUrisFromConfig(isProd) {
   const gaiaBase = nodeConfig.get('servers.gaia.graphql')
   const codingChallengeBase = nodeConfig.get('servers.codingChallenge.graphql')
   return {
-    gaiaGraphqlUri: String(gaiaBase).replace(/\/$/, ''),
-    codingChallengeGraphqlUri: String(codingChallengeBase).replace(/\/$/, ''),
+    gaiaGraphqlUri: ensureGraphqlPath(String(gaiaBase)),
+    codingChallengeGraphqlUri: ensureGraphqlPath(String(codingChallengeBase)),
   }
 }
 
@@ -32,16 +51,18 @@ module.exports = (_env, argv) => {
   const configUris = graphqlUrisFromConfig(isProd)
   
   const envGaiaUri = process.env.GAIA_GRAPHQL_URI
-  const gaiaGraphqlUri =
+  const gaiaGraphqlUri = ensureGraphqlPath(
     typeof envGaiaUri === 'string' && envGaiaUri.length > 0
       ? envGaiaUri
-      : configUris.gaiaGraphqlUri
+      : configUris.gaiaGraphqlUri,
+  )
 
   const envCodingChallengeUri = process.env.CODING_CHALLENGE_GRAPHQL_URI
-  const codingChallengeGraphqlUri =
+  const codingChallengeGraphqlUri = ensureGraphqlPath(
     typeof envCodingChallengeUri === 'string' && envCodingChallengeUri.length > 0
       ? envCodingChallengeUri
-      : configUris.codingChallengeGraphqlUri
+      : configUris.codingChallengeGraphqlUri,
+  )
 
   return {
     entry: './src/index.tsx',

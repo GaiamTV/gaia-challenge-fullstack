@@ -1,5 +1,7 @@
-import 'dotenv/config'
 import { createApp } from './app'
+import { loadEnv } from './loadEnv'
+
+loadEnv()
 
 const portRaw = process.env.PORT
 const port = portRaw !== undefined && portRaw !== '' ? Number(portRaw) : 9001

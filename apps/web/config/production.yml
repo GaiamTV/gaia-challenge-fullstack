@@ -1,5 +1,5 @@
 servers:
   gaia:
-    graphql: 'https://graphql.gaia.com'
+    graphql: 'https://graphql.gaia.com/graphql'
   codingChallenge:
     graphql: 'http://localhost:9001/graphql'

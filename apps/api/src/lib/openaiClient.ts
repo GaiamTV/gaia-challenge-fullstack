@@ -49,14 +49,17 @@ function getBrooklynUrl(): string {
 
 /**
  * Get the bearer token for authentication
- * Set via BROOKLYN_BEARER_TOKEN environment variable
+ * Set via BROOKLYN_BEARER_TOKEN environment variable (raw JWT or "Bearer <jwt>")
  */
 function getBearerToken(): string {
   const token = process.env.BROOKLYN_BEARER_TOKEN
   if (!token) {
     throw new Error('BROOKLYN_BEARER_TOKEN environment variable is not set')
   }
-  return token
+  if (/^Bearer\s/i.test(token)) {
+    return token
+  }
+  return `Bearer ${token}`
 }
 
 /**
@@ -72,7 +75,7 @@ export async function makeOpenAIRequest(
 
   const headers = {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
+    Authorization: token,
   }
 
   const controller = new AbortController()

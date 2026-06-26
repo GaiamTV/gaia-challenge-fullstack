@@ -5,13 +5,14 @@ import {
   InMemoryCache,
   from,
 } from '@apollo/client'
+import { ensureGraphqlPath } from './ensureGraphqlPath'
 
 const shouldConnectToDevTools = process.env.NODE_ENV === 'development'
 
 function gaiaGraphqlUri(): string {
   const uri = process.env.GAIA_GRAPHQL_URI
   if (typeof uri === 'string' && uri.length > 0) {
-    return uri
+    return ensureGraphqlPath(uri)
   }
   return '/graphql'
 }
@@ -19,7 +20,7 @@ function gaiaGraphqlUri(): string {
 function codingChallengeGraphqlUri(): string {
   const uri = process.env.CODING_CHALLENGE_GRAPHQL_URI
   if (typeof uri === 'string' && uri.length > 0) {
-    return uri
+    return ensureGraphqlPath(uri)
   }
   return 'http://localhost:9001/graphql'
 }

@@ -1,5 +1,5 @@
 import { useLazyQuery } from '@apollo/client'
-import { Box, List, ListItem, ListItemText, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import {
   CONTENT_LIST_SERIES_EPISODES_QUERY,
   type ContentListSeriesEpisodesData,
@@ -11,6 +11,7 @@ import {
 } from '../graphql/codingChallengeList'
 import { useCodingChallengeClient } from '../lib/codingChallengeContext'
 import ContentSectionAccordion from './ContentSectionAccordion'
+import EpisodeList from './EpisodeList'
 import PageQueryStates from './PageQueryStates'
 
 export default function ContentListFetchSection() {
@@ -30,8 +31,9 @@ export default function ContentListFetchSection() {
     },
   )
 
-  const episodes =
-    contentQueryState.data?.contentList?.content?.[0]?.contentEpisodes?.filter(Boolean) ?? []
+  const series = contentQueryState.data?.contentList?.content?.[0]
+  const episodes = series?.contentEpisodes?.filter(Boolean) ?? []
+  const seriesTitle = series?.title ?? 'Unknown series'
 
   const challengeResult = challengeQueryState.data?.codingChallengeList
 
@@ -54,30 +56,7 @@ export default function ContentListFetchSection() {
             notFoundTitle="Not found"
             notFoundDetail="No matching series or episodes were returned."
           >
-            <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
-              Episodes ({episodes.length})
-            </Typography>
-            <List dense>
-              {episodes.map((ep) => (
-                <ListItem
-                  key={ep.id ?? `${ep.contentId ?? 'unknown'}-${ep.title ?? ''}`}
-                  disablePadding
-                  sx={{ py: 0.5 }}
-                >
-                  <ListItemText
-                    primary={ep.title ?? 'Untitled'}
-                    secondary={[
-                      ep.contentType,
-                      ep.contentId != null ? `contentId ${ep.contentId}` : null,
-                      ep.seasonNumber != null ? `S${ep.seasonNumber}` : null,
-                      ep.episodeNumber != null ? `E${ep.episodeNumber}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  />
-                </ListItem>
-              ))}
-            </List>
+            <EpisodeList seriesTitle={seriesTitle} episodes={episodes} />
           </PageQueryStates>
         ) : null}
       </Box>
